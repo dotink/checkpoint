@@ -37,7 +37,7 @@ class ValidationException extends Exception
 	 * @param string $path
 	 * @return array<string, mixed>|array<string> The list of validation messages based on violated rules
 	 */
-	public function getMessages(string $path = NULL): array
+	public function getMessages(?string $path = NULL): array
 	{
 		return $this->inspector->getMessages($path);
 	}

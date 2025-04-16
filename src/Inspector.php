@@ -43,7 +43,7 @@ abstract class Inspector implements Validation
 	 * @access private
 	 * @var array<string, self>
 	 */
-	protected $children = array();
+	protected $children = [];
 
 
 	/**
@@ -55,7 +55,7 @@ abstract class Inspector implements Validation
 	 * @access protected
 	 * @var array<string, string>
 	 */
-	protected $errors = array();
+	protected $errors = [];
 
 
 	/**
@@ -64,7 +64,7 @@ abstract class Inspector implements Validation
 	 * @access protected
 	 * @var array<string, Validator>
 	 */
-	protected $rules = array();
+	protected $rules = [];
 
 
 	/**
@@ -82,7 +82,7 @@ abstract class Inspector implements Validation
 	 * @access private
 	 * @var array<string, array<string>>
 	 */
-	private $messages = array();
+	private $messages = [];
 
 
 	/**
@@ -91,9 +91,9 @@ abstract class Inspector implements Validation
 	 * @access public
 	 * @param string $reference The reference used to find or recall the child
 	 * @param Inspector $child The child instance
-	 * @return Inspector The object instance for method chaining
+	 * @return static The object instance for method chaining
 	 */
-	public function add(string $reference, Inspector $child)
+	public function add(string $reference, Inspector $child): static
 	{
 		$this->children[$reference] = $child;
 
@@ -166,7 +166,7 @@ abstract class Inspector implements Validation
 			$count += count($this->messages[$key]);
 		}
 
-		foreach ($this->children as $reference => $inspector) {
+		foreach ($this->children as $inspector) {
 			$count += $inspector->countMessages();
 		}
 
@@ -209,10 +209,10 @@ abstract class Inspector implements Validation
 				return $this->messages[$path];
 			}
 
-			if (strpos($path, '.') === FALSE) {
+			if (!str_contains($path, '.')) {
 				return isset($this->children[$path])
 					? $this->children[$path]->getMessages()
-					: array();
+					: [];
 			}
 
 			$parts = explode('.', $path);
@@ -220,7 +220,7 @@ abstract class Inspector implements Validation
 
 			return isset($this->children[$head])
 				? $this->children[$head]->getMessages(implode('.', $parts))
-				: array();
+				: [];
 		}
 
 		$messages = $this->messages;
@@ -300,8 +300,8 @@ abstract class Inspector implements Validation
 	 */
 	protected function clear(): self
 	{
-		$this->messages = array();
-		$this->rules    = array();
+		$this->messages = [];
+		$this->rules    = [];
 		$this->errors   = static::$defaultErrors;
 
 		return $this;

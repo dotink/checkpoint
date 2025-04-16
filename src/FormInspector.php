@@ -15,7 +15,7 @@ abstract class FormInspector extends Inspector
 	 * @access protected
 	 * @var array<string, mixed>
 	 */
-	protected $checks = array();
+	protected $checks = [];
 
 
 	/**
@@ -24,7 +24,7 @@ abstract class FormInspector extends Inspector
 	 * @access protected
 	 * @var array<string, self>
 	 */
-	protected $children = array();
+	protected $children = [];
 
 
 	/**
@@ -33,7 +33,7 @@ abstract class FormInspector extends Inspector
 	 * @access protected
 	 * @var array<string, mixed>
 	 */
-	protected $requirements = array();
+	protected $requirements = [];
 
 
 	/**
@@ -78,7 +78,7 @@ abstract class FormInspector extends Inspector
 			if (isset($this->checks[$field])) {
 				$checks = $this->checks[$field];
 			} else {
-				$checks = array();
+				$checks = [];
 			}
 
 			if (empty($this->requirements[$field])) {
@@ -97,7 +97,7 @@ abstract class FormInspector extends Inspector
 				$child->setChecks($this->checks[$field]);
 			}
 
-			$child->run($data[$field] ?? array());
+			$child->run($data[$field] ?? []);
 		}
 	}
 }
