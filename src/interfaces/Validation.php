@@ -12,5 +12,5 @@ use Respect\Validation\Validator;
  */
 interface Validation
 {
-	public function setValidator(Validator $validator): self;
+	public function setValidator(Validator $validator): static;
 }

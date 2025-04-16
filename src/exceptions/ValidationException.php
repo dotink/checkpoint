@@ -22,9 +22,9 @@ class ValidationException extends Exception
 	/**
 	 * @access public
 	 * @param Inspector $inspector
-	 * @return self
+	 * @return static
 	 */
-	public function setInspector(Inspector $inspector): self
+	public function setInspector(Inspector $inspector): static
 	{
 		$this->inspector = $inspector;
 

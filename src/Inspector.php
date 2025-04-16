@@ -2,6 +2,7 @@
 
 namespace Checkpoint;
 
+use Respect\Validation\Validatable;
 use RuntimeException;
 use Respect\Validation\Validator;
 
@@ -15,8 +16,6 @@ abstract class Inspector implements Validation
 	/**
 	 * Default errors corresponding to argumentless validation rules
 	 *
-	 * @static
-	 * @access protected
 	 * @var array<string, string>
 	 */
 	static protected $defaultErrors = [
@@ -40,7 +39,6 @@ abstract class Inspector implements Validation
 	/**
 	 * List of child inspectors
 	 *
-	 * @access private
 	 * @var array<string, self>
 	 */
 	protected $children = [];
@@ -52,7 +50,6 @@ abstract class Inspector implements Validation
 	 * These will reflect `$defaultErrors` when the inspector is cleared and will have new ones
 	 * added as they are defined.
 	 *
-	 * @access protected
 	 * @var array<string, string>
 	 */
 	protected $errors = [];
@@ -61,7 +58,6 @@ abstract class Inspector implements Validation
 	/**
 	 * Custom rules keyed by the rule name
 	 *
-	 * @access protected
 	 * @var array<string, Validator>
 	 */
 	protected $rules = [];
@@ -69,17 +65,13 @@ abstract class Inspector implements Validation
 
 	/**
 	 * The internal validator
-	 *
-	 * @access protected
-	 * @var Validator|null
 	 */
-	protected $validator = NULL;
+	protected Validator $validator;
 
 
 	/**
 	 * List of logged messages
 	 *
-	 * @access private
 	 * @var array<string, array<string>>
 	 */
 	private $messages = [];
@@ -87,11 +79,6 @@ abstract class Inspector implements Validation
 
 	/**
 	 * Add a child inspector
-	 *
-	 * @access public
-	 * @param string $reference The reference used to find or recall the child
-	 * @param Inspector $child The child instance
-	 * @return static The object instance for method chaining
 	 */
 	public function add(string $reference, Inspector $child): static
 	{
@@ -103,15 +90,8 @@ abstract class Inspector implements Validation
 
 	/**
 	 * Check data against a particular set of rules
-	 *
-	 * @access public
-	 * @param string $key The key to use when logging error messages
-	 * @param mixed $data The data to validate against the rules
-	 * @param array<string> $rules The array of rules to check the data against
-	 * @param bool $is_optional Allow all checks to fail if no data is present
-	 * @return bool Whether or not the check passed or failed
 	 */
-	public function check(string $key, $data, array $rules, bool $is_optional = FALSE): bool
+	public function check(string $key, mixed $data, array $rules, bool $is_optional = FALSE): bool
 	{
 		$pass = TRUE;
 
@@ -154,11 +134,8 @@ abstract class Inspector implements Validation
 
 	/**
 	 * Count the number of validation messages (including registered children)
-	 *
-	 * @access public
-	 * @return integer The number of error messages across this inspector and all its children
 	 */
-	public function countMessages()
+	public function countMessages(): int
 	{
 		$count = 0;
 
@@ -177,14 +154,11 @@ abstract class Inspector implements Validation
 	/**
 	 * Define a new rule and its related error messaging
 	 *
-	 * @access public
-	 * @param string $rule The name of the rule to define
-	 * @param string $error The error message to log if the rule is violated
-	 * @return Validator A new respect validator instance for chaining rules
+	 * @param array<Validatable>
 	 */
-	public function define($rule, $error)
+	public function define(string $rule, string $error, array $rules = []): Validator
 	{
-		$this->rules[$rule]  = $this->validator->create();
+		$this->rules[$rule]  = $this->validator->create(...$rules);
 		$this->errors[$rule] = $error;
 
 		return $this->rules[$rule];
@@ -198,11 +172,9 @@ abstract class Inspector implements Validation
 	 * a child validator was added with `person` and contained a validation messages logged to `firstName` then the
 	 * path `person.firstName` would acquire those validation messages.
 	 *
-	 * @access public
-	 * @param string $path The path to the validation messages
 	 * @return array<string, mixed>|array<string> The list of validation messages based on violated rules
 	 */
-	public function getMessages($path = NULL): array
+	public function getMessages(?string $path = NULL): array
 	{
 		if ($path) {
 			if (isset($this->messages[$path])) {
@@ -242,13 +214,8 @@ abstract class Inspector implements Validation
 	 *
 	 * Instead of running the validate method directly, run should be used to ensure initial messages from any previous
 	 * validation are cleared and the inspector is reset.
-	 *
-	 * @access public
-	 * @param mixed $data The data to validate
-	 * @param bool $exception_on_messages Throw an exception if there are error messages
-	 * @return self The object instance for method chaining
 	 */
-	public function run($data, $exception_on_messages = FALSE): self
+	public function run(mixed $data, bool $exception_on_messages = FALSE): static
 	{
 		$this->clear();
 		$this->setup($data);
@@ -268,23 +235,16 @@ abstract class Inspector implements Validation
 
 	/**
 	 * Set up validation checks and default error messages for the data
-	 * @access public
-	 * @param mixed $data The data to validate
-	 * @return void
 	 */
-	protected function setup($data)
+	protected function setup($data): void
 	{
 	}
 
 
 	/**
 	 * Set the internal validator (an instance of Respect\Validation)
-	 *
-	 * @access public
-	 * @param Validator $validator The internal validator instance
-	 * @return Validation The object instance for method chaining
 	 */
-	public function setValidator(Validator $validator): Validation
+	public function setValidator(Validator $validator): static
 	{
 		$this->validator = $validator;
 
@@ -294,11 +254,8 @@ abstract class Inspector implements Validation
 
 	/**
 	 * Clear the messages, rules, and errors for this inspector (reset it back to defaults)
-	 *
-	 * @access protected
-	 * @return self The object instance for method chaining
 	 */
-	protected function clear(): self
+	protected function clear(): static
 	{
 		$this->messages = [];
 		$this->rules    = [];
@@ -313,12 +270,8 @@ abstract class Inspector implements Validation
 	 *
 	 * This method is generally used inside the custom `validate()` method of the parent inspector to fetch a child
 	 * and pass a subset of its data to the child for validation.
-	 *
-	 * @access protected
-	 * @param string $reference The reference under which the child inspector was added
-	 * @return self The child inspector instance
 	 */
-	protected function fetch($reference): self
+	protected function fetch(string $reference): static
 	{
 		if (!isset($this->children[$reference])) {
 			throw new RuntimeException(sprintf(
@@ -333,13 +286,8 @@ abstract class Inspector implements Validation
 
 	/**
 	 * Log a message on this inspector
-	 *
-	 * @access protected
-	 * @param string $key The key under which to log the message.
-	 * @param string $message The message to log
-	 * @return self The object instance for method chaining
 	 */
-	protected function log($key, $message): self
+	protected function log(string $key, string $message): static
 	{
 		$this->messages[$key][] = $message;
 
@@ -351,12 +299,8 @@ abstract class Inspector implements Validation
 	 * Validate some data
 	 *
 	 * This method is intended to be overloaded with custom/explicit validation.
-	 *
-	 * @access protected
-	 * @param mixed $data The data to validate
-	 * @return void
 	 */
-	protected function validate($data)
+	protected function validate($data): void
 	{
 		return;
 	}

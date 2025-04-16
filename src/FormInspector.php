@@ -12,7 +12,6 @@ abstract class FormInspector extends Inspector
 	/**
 	 * A list of checks keyed by field
 	 *
-	 * @access protected
 	 * @var array<string, mixed>
 	 */
 	protected $checks = [];
@@ -21,7 +20,6 @@ abstract class FormInspector extends Inspector
 	/**
 	 * List of child inspectors
 	 *
-	 * @access protected
 	 * @var array<string, self>
 	 */
 	protected $children = [];
@@ -30,18 +28,17 @@ abstract class FormInspector extends Inspector
 	/**
 	 * A list of requirements keyed by field
 	 *
-	 * @access protected
 	 * @var array<string, mixed>
 	 */
 	protected $requirements = [];
 
 
 	/**
-	 * @access public
+	 * Allow for dynamically setting checks
+	 *
 	 * @param array<string, mixed> $checks
-	 * @return self
 	 */
-	public function setChecks(array $checks): self
+	public function setChecks(array $checks): static
 	{
 		$this->checks = array_replace_recursive($this->checks, $checks);
 
@@ -50,11 +47,11 @@ abstract class FormInspector extends Inspector
 
 
 	/**
-	 * @access public
+	 * Allow for dynamically setting requirements
+	 *
 	 * @param array<string, mixed> $requirements
-	 * @return self
 	 */
-	public function setRequirements(array $requirements): self
+	public function setRequirements(array $requirements): static
 	{
 		$this->requirements = array_replace_recursive($this->requirements, $requirements);
 
@@ -65,7 +62,7 @@ abstract class FormInspector extends Inspector
 	/**
 	 * @{inheritDoc}
 	 */
-	protected function validate($data)
+	protected function validate(mixed $data): void
 	{
 		$fields = array_unique(array_diff(array_merge(
 			array_keys($this->checks),
