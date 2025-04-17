@@ -2,6 +2,7 @@
 
 namespace Checkpoint;
 
+use Countable;
 use Exception;
 
 /**
@@ -10,7 +11,7 @@ use Exception;
  * @author Matthew J. Sahagian [mjs] matthew.sahagian@gmail.com
  * @copyright Imarc LLC 2016
  */
-class ValidationException extends Exception
+class ValidationException extends Exception implements Countable
 {
 	/**
 	 * @access protected
@@ -18,6 +19,13 @@ class ValidationException extends Exception
 	 */
 	protected $inspector = NULL;
 
+	/**
+	 *
+	 */
+	public function count(): int
+	{
+		return count($this->inspector->getMessages());
+	}
 
 	/**
 	 * @access public
