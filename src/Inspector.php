@@ -210,6 +210,17 @@ abstract class Inspector implements Validation
 
 
 	/**
+	 * Log a message on this inspector
+	 */
+	public function log(string $key, string $message): static
+	{
+		$this->messages[$key][] = $message;
+
+		return $this;
+	}
+
+
+	/**
 	 * The entry point for running validation
 	 *
 	 * Instead of running the validate method directly, run should be used to ensure initial messages from any previous
@@ -281,17 +292,6 @@ abstract class Inspector implements Validation
 		}
 
 		return $this->children[$reference];
-	}
-
-
-	/**
-	 * Log a message on this inspector
-	 */
-	protected function log(string $key, string $message): static
-	{
-		$this->messages[$key][] = $message;
-
-		return $this;
 	}
 
 
